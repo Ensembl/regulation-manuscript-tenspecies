@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 120
----
-
 ## Experiments analysis
 
 This folder contains the [metadataProcessing.Rmd](./scripts/metadataProcessing.Rmd) script

@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 120
----
-
 ## Ensembl Regulatory Annotation
 
 This folder contains scripts for annotating **Regulatory Features (RFs)** as part of the *Regulatory Annotation Pipeline* of Ensembl Regulation (EMBL-EBI).  
@@ -336,7 +330,9 @@ Assuming we have:
 The command line we used to run the [RegulatoryBuild.R](./scripts/RegulatoryBuild.R) script is:
 
 <details>
-<summary> Code: </summary>
+
+<summary>Code:</summary>
+
 ```         
 Rscript /path/to/the/RBscript/RegulatoryBuild.R "homo_sapiens" "GRCh38" "ENS" 1 \
 "/path/to/gencodeV48/gencode.v48.annotation_TSS.bed" \
@@ -349,7 +345,9 @@ Rscript /path/to/the/RBscript/RegulatoryBuild.R "homo_sapiens" "GRCh38" "ENS" 1 
 --h3k4me1pattern "k4me1" --h3k27acpattern "k27ac" --h3k4me3pattern "k4me3" \
 --exportActivity FALSE > /path/to/output/folder/homo_sapiens.GRCh38.v114.log
 ```
+
 </details>
+
 ---
 
 ### Lifting over Regulatory Features between assemblies
@@ -453,7 +451,9 @@ options:
   --promColor promColor
                         Color of promoters.
 ```
+
 </details>
+
 
 #### Example: Mapping features from *GRCh38* to *GRCh37*
 
@@ -486,6 +486,7 @@ Required files:
     --flagsRemove 'mRNA_start_NF'
     ```
 </details>
+
 
 <details>
 
