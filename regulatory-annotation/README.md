@@ -359,8 +359,10 @@ another.
 
 Starting from a set of **RFs** and Transcription Factor (TF) binding **motif features** annotated in assembly *A*, it uses [LiftOver](https://genome.ucsc.edu/cgi-bin/hgLiftOver) to project these features onto assembly *B* using the appropriate chain file that describes the conversion between these assemblies.
 
-<details><summary>The processing steps are:</summary>
+<details>
+<summary>The processing steps are:</summary>
 <br> 
+
    a. Load current **motifs features** and **RFs** identified in assembly *A* and expand the list to include extended *promoters* when present.
    
    b. Map chromosome IDs from Ensembl style to the one used in the liftOver chain file. 
@@ -391,6 +393,8 @@ Starting from a set of **RFs** and Transcription Factor (TF) binding **motif fea
       
       - Keep only *CTCFs* that overlap kept *CTCF* **motifs**. If there is more than one, then pick the first one.
 
+</details>
+
 #### How to use
 
 In addition to the **RFs** and **motif *features** files from assembly *A*, and the corresponding chain file for `liftOver`, the script also requires the assembly report files for both assemblies *A* and *B* in order to correctly map chromosome names between the different files. 
@@ -401,7 +405,7 @@ A detailed list of required and optional parameters can be checked by using the 
 
 <details>
 
-<summary><code>Code</code></summary>
+<summary>Code:</summary>
 
 ```         
 Rscript FeaturesLiftOver.R -h
