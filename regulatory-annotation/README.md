@@ -314,6 +314,7 @@ rm all.bed allCov.bed
 
 </details>
 <br>
+
 The `OCPeaksGT10Perc_6.bed` contains all the open chromatin regions that were used for the **RFs** definition.
 
 Assuming we have:
@@ -361,37 +362,36 @@ Starting from a set of **RFs** and Transcription Factor (TF) binding **motif fea
 
 <details>
 <summary>The processing steps are:</summary>
-<br> 
 
-   a. Load current **motifs features** and **RFs** identified in assembly *A* and expand the list to include extended *promoters* when present.
-   
-   b. Map chromosome IDs from Ensembl style to the one used in the liftOver chain file. 
-   
-   c. Translate the **RFs** by running liftOver to assembly *B*.
-   
-   d. Load lifted **RFs** and map chromosome IDs back to *Ensembl* style 
-   
-   e. Use the extended *promoter* feature coordinates to fill the attribute columns of *promoters* when possible.
-   
-   f. Remove **RFs** mapping to non-canonical chromosomes and **RFs** mapped to different chromosomes (if specified).
-   
-   g. Update promoter-genes links matching `gene_name` or `gene_id` and keep only the links matching gene attributes between *A* and *B*.
-   
-   h. Solving overlapping features applying the following rules:
-   
-      - Keep *promoters* linked to *protein coding* over *lncRNA* genes and then remove *EMARs* overlapping the discarded *promoters*.
-      
-      - Keep *EMARs* with the largest number of *promoters* linked to *protein_coding* genes and remove *promoters* overlapping discarded *EMARs*.
-      
-      - Keep *EMARs* with the largest region overlapping *promoters*, or the largest number of *promoters* and remove *promoters* overlapping discarded *EMARs*.
-      
-      - For *EMARs* that do not overlap *promoters*, keep the first one and remove *enhancers* overlapping discarded *EMARs*.
-      
-      - Keep *open chromatin regions* that do not overlap *promoters* or *enhancers*, selecting the first in location when there is any overlapping.
-      
-      - Remove **motifs** and *CTCFs* overlapping any discarded *promoter*, *enhancer*, *open chromatin region*, or *EMAR*. 
-      
-      - Keep only *CTCFs* that overlap kept *CTCF* **motifs**. If there is more than one, then pick the first one.
+a. Load current **motifs features** and **RFs** identified in assembly *A* and expand the list to include extended *promoters* when present.
+
+b. Map chromosome IDs from Ensembl style to the one used in the liftOver chain file. 
+
+c. Translate the **RFs** by running liftOver to assembly *B*.
+
+d. Load lifted **RFs** and map chromosome IDs back to *Ensembl* style 
+
+e. Use the extended *promoter* feature coordinates to fill the attribute columns of *promoters* when possible.
+
+f. Remove **RFs** mapping to non-canonical chromosomes and **RFs** mapped to different chromosomes (if specified).
+
+g. Update promoter-genes links matching `gene_name` or `gene_id` and keep only the links matching gene attributes between *A* and *B*.
+
+h. Solving overlapping features applying the following rules:
+    
+    - Keep *promoters* linked to *protein coding* over *lncRNA* genes and then remove *EMARs* overlapping the discarded *promoters*.
+    
+    - Keep *EMARs* with the largest number of *promoters* linked to *protein_coding* genes and remove *promoters* overlapping discarded *EMARs*.
+    
+    - Keep *EMARs* with the largest region overlapping *promoters*, or the largest number of *promoters* and remove *promoters* overlapping discarded *EMARs*.
+    
+    - For *EMARs* that do not overlap *promoters*, keep the first one and remove *enhancers* overlapping discarded *EMARs*.
+    
+    - Keep *open chromatin regions* that do not overlap *promoters* or *enhancers*, selecting the first in location when there is any overlapping.
+    
+    - Remove **motifs** and *CTCFs* overlapping any discarded *promoter*, *enhancer*, *open chromatin region*, or *EMAR*. 
+    
+    - Keep only *CTCFs* that overlap kept *CTCF* **motifs**. If there is more than one, then pick the first one.
 
 </details>
 
