@@ -18,8 +18,6 @@ The scripts support:
 - [Preparing genome annotation](#preparing-genome-annotation)  
 - [Annotating Regulatory Features](#annotating-regulatory-features)  
 - [Lifting over Regulatory Features between assemblies](#lifting-over-regulatory-features-between-assemblies)  
-- [Citation](#citation)  
-- [License](#license)  
 
 ---
 
