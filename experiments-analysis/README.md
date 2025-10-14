@@ -11,9 +11,13 @@ by the Ensembl Regulation [primary analysis pipeline](https://regulation.ensembl
 
 ### Requirements
 
+- [Docker](https://www.docker.com/) with the RDR image.
 - [R](https://cran.r-project.org/) (>= 4.0) with packages: 
-  - [argparse](https://cloud.r-project.org/web/packages/argparse/index.html) 
+  - [RPostgreSQL](https://cloud.r-project.org/web/packages/RPostgreSQL/index.html) 
   - [dplyr](https://cloud.r-project.org/web/packages/dplyr/index.html)
   - [stringr](https://cloud.r-project.org/web/packages/stringr/index.html)
   - [tidyr](https://cloud.r-project.org/web/packages/tidyr/index.html) 
-  - [bedtoolsr](http://phanstiel-lab.med.unc.edu/bedtoolsr.html)
+  - [ggplot2](https://cloud.r-project.org/web/packages/ggplot2/index.html)
+  - [cowplot](https://cloud.r-project.org/web/packages/cowplot/index.html)
+  - [ggh4x](https://cloud.r-project.org/web/packages/ggh4x/index.html)
+
