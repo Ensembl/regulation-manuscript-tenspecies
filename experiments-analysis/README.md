@@ -20,4 +20,5 @@ by the Ensembl Regulation [primary analysis pipeline](https://regulation.ensembl
   - [ggplot2](https://cloud.r-project.org/web/packages/ggplot2/index.html)
   - [cowplot](https://cloud.r-project.org/web/packages/cowplot/index.html)
   - [ggh4x](https://cloud.r-project.org/web/packages/ggh4x/index.html)
+  - [rtracklayer](https://bioconductor.org/packages/release/bioc/html/rtracklayer.html)
 
