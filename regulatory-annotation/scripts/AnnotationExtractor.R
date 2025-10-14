@@ -1,3 +1,8 @@
+# Script: AnnotationExtractor.R
+# Author: Gabriela Merino - Ensembl Regulation
+# Date: 10-2025
+# Description: Extract TSSs and CDSs annotation from Ensembl/GENCODE GFF3 files
+
 suppressPackageStartupMessages({
   library(dplyr)
   library(argparse)

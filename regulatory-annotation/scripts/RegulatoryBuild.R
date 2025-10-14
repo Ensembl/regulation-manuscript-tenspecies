@@ -1,3 +1,8 @@
+# Script: RegulatoryBuild.R
+# Author: Gabriela Merino - Ensembl Regulation
+# Date: 10-2025
+# Description: Regulatory features identification with the Ensembl regulatory build.
+
 suppressPackageStartupMessages({
   library(dplyr)
   library(bedtoolsr)

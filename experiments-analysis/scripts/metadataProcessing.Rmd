@@ -1,7 +1,8 @@
 ---
-title: "Summary of epigenomic experiments in Ensembl 114"
-output: html_document
+title: "Epigenomic experiments in Ensembl 114"
+author: "Gabriela Merino - Ensembl Regulation"
 date: "2025-09-19"
+output: html_document
 ---
 
 
@@ -21,14 +22,10 @@ and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation
 library(dplyr)
 library(tidyr)
 library(stringr)
-library(bedtoolsr)
 library(RPostgreSQL)
 library(ggplot2)
 library(cowplot)
-library(ggfortify)
 library(ggh4x)
-library(RColorBrewer)
-library(ggnewscale)
 ```
 
 Connecting with the `Regulation Data Registry` database: 
@@ -220,7 +217,6 @@ names(markCols) <- unique(dfPlot$experiment_target)
 
 g <- ggplot(dfPlot) +
       geom_bar(aes(x = 1, y = 1, 
-                   # color = species,
                    fill = experiment_target, alpha = n), stat = 'identity',
                position = position_dodge(width = 1)) +
       geom_text(aes( x = 1, y = 0.5, label = n), size = 5) + 
@@ -235,7 +231,6 @@ g <- ggplot(dfPlot) +
             strip.text.y = element_text(size = 11,face = 'bold')
             ) +
       scale_fill_manual(values = markCols)  
-  # scale_color_manual(values = specCols)
 g
 ```
 
@@ -255,7 +250,6 @@ names(specCols) <- speciesMap
 
 g <- ggplot(dfPlot) +
       geom_bar(aes(x = 1, y = 1, 
-                   # color = species,
                    fill = species, alpha = n), stat = 'identity',
                position = position_dodge(width = 1)) +
       geom_text(aes( x = 1, y = 0.5, label = n), size = 5) + 
@@ -269,7 +263,6 @@ g <- ggplot(dfPlot) +
             strip.text.x = element_text(face = 'bold'), 
             strip.text.y = element_text(face = 'bold')) +
       scale_fill_manual(values = specCols)  
-  # scale_color_manual(values = specCols)
 g
 ```
 
@@ -377,7 +370,7 @@ dfPlot[,'biosample_group'] <- factor(dfPlot[,'biosample_group'],
 
 ```
 
-Figure **2A**: Tetrapods
+Figure **1a**: Tetrapods
 
 ```{r, fig.width=12,fig.height=8, message = FALSE}
 tetrapods <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle')
@@ -417,7 +410,7 @@ tetrapods_legend <-get_plot_component(tetrapods_plot +
                                       'guide-box', return_all = TRUE)
 ```
 
-Figure **2B**: Fishes
+Figure **1a**: Fishes
 
 ```{r, fig.width=12,fig.height=3.5, message = FALSE}
 fishes <- c('Atlantic salmon', 'Common carp', 'European seabass',
@@ -451,7 +444,7 @@ dfPlot %>%
 Arranging both panel in a single figure:
 
 ```{r, fig.width=10,fig.height= 9.6, message = FALSE}
-Figure2 <- plot_grid(plot_grid(tetrapods_plot, 
+Figure_1_a <- plot_grid(plot_grid(tetrapods_plot, 
                     # adding and empty plot just for adjusting margins 
                     plot_grid(ggplot() + 
                                 theme(panel.background = 
@@ -464,5 +457,5 @@ Figure2 <- plot_grid(plot_grid(tetrapods_plot,
                     # adding legend
                     tetrapods_legend,
                     nrow =2, rel_heights = c(1, 0.05))
-Figure2
+Figure_1_a
 ```

@@ -1,3 +1,8 @@
+# Script: FeaturesLiftOver.R
+# Author: Gabriela Merino - Ensembl Regulation
+# Date: 10-2025
+# Description: Project ensembl regulatory features between two assemblies.
+
 suppressPackageStartupMessages({
   library(dplyr)
   library(argparse)
@@ -6,7 +11,7 @@ suppressPackageStartupMessages({
   library(tidyr)
   set.seed(1234)
 })
-options(scipen=999)
+options(scipen = 999)
 
 parsingArgs <- function(){
   parser <- ArgumentParser(prog = 'Rscript FeaturesLiftOver.R',

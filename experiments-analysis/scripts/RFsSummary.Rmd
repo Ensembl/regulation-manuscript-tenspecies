@@ -1,0 +1,114 @@
+---
+title: "Regulatory Features in Ensembl 114"
+author: "Gabriela Merino - Ensembl Regulation"
+date: "2025-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This script is aimed to explore and plot the number of Ensembl Regulatory Features identified with the Ensembl [Regulatory Build](https://regulation.ensembl.org/help/regulatory_build)
+and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/). 
+
+
+```{r, warning = FALSE, message = FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(rtracklayer)
+```
+
+The first step is to download the files from the Ensembl FTP. This script will 
+place them in the `~/Downloads/` folder. If you want to use this code, make 
+sure you specified the correct path to your data folder.
+
+```{r}
+# replace with the full path to the folder where files will be downloaded
+data_folder <- "~/Downloads/"
+
+eFTP <- "https://ftp.ensembl.org/pub/release-114/regulation"
+
+
+species <- c('Homo_sapiens', 'Mus_musculus', 'Sus_scrofa', 'Gallus_gallus',
+             'Bos_taurus', 'Salmo_salar', 'Scophthalmus_maximus', 
+             'Dicentrarchus_labrax', 'Oncorhynchus_mykiss', 
+             'Cyprinus_carpio_carpio')
+names(species) <- c('Human', 'Mouse', "Pig", "Chicken", "Cattle", 
+                    "Atlantic \n salmon", "Turbot", "European \n seabass", 
+                    "Rainbow \n trout", "Common \n carp")
+assemblies <- c('GRCh38', 'GRCm39', 'Sscrofa11.1', 'GRCg7b', 'ARS-UCD2.0',
+                'Ssal_v3.1', 'ASM1334776v1', 'dlabrax2021', 'USDA_OmykA_1.1', 
+                'Cypcar_WagV4.0')
+```
+
+```{r}
+for(i in 1:length(species)){
+  reg_file <- paste(species[i], assemblies[i],
+                    "regulatory_features.v114.gff3.gz", sep = "." )
+  dest_reg_file <- paste(data_folder, species[i], ".v114.gff3.gz", sep = '')
+  download.file(paste(eFTP, tolower(species[i]), assemblies[i], "annotation",
+                      reg_file, sep = "/"), destfile = dest_reg_file)
+  system(paste('gzip -d ', dest_reg_file, sep = ''))
+}
+```
+
+The next step is to import the regulatory features from the downloaded files,
+and compute number of features per feature type and per species.
+
+```{r}
+rfs_summary <- NULL
+
+for(i in 1:length(species)){
+  readGFF(paste(data_folder, species[i], ".v114.gff3", sep = '')) %>%
+    as.data.frame() %>%
+    group_by(type) %>%
+    summarize(species_name = names(species)[i], n = n()) %>%
+    bind_rows (rfs_summary) -> rfs_summary
+}
+```
+
+Preparing the dataset to be plot.
+
+```{r}
+rfs_summary %>%
+  mutate(species_name = factor(species_name, levels = names(species)),
+         type = factor( type, levels = c("promoter", "enhancer",
+                                         "CTCF_binding_site", 
+                                         "open_chromatin_region" ),
+                        labels = c("promoter",  "enhancer",
+                                   "CTCF binding site", 
+                                   "open chromatin" ))) -> rfs_summary
+
+```
+
+```{r, fig.height=5, fig.width=9, dpi = 300}
+rf_colors <- c('promoter' = '#ff0000', 'enhancer' = '#faca00', 
+            'CTCF binding site' = '#40e0d0', 'open chromatin' = '#d9d9d9')
+
+rfs_summary %>%
+  ggplot(aes (x = species_name, y = n, fill = type)) + 
+  geom_bar(stat = 'identity', position = position_stack(reverse = TRUE)) +
+  theme_bw() +
+  theme(legend.position.inside = c(0.9,0.9), legend.background = element_blank(),
+        axis.ticks.x = element_blank(), axis.text.x = element_text(vjust = 0.5),
+        panel.grid = element_blank()) + 
+  labs(fill = '', x = '', y = 'Number of annotated regulatory regions') + 
+  scale_fill_manual(values = rf_colors) + 
+  scale_y_continuous(limits = c(0, 400000), breaks = seq(0, 400000, 50000),
+                     expand = c(0,0)) -> Figure_1_b
+Figure_1_b
+
+```
+
+Finally, we will export the data displayed in the bar plot.
+
+```{r, eval = FALSE}
+rfs_summary %>%
+  #remove the '\n' character in the species names
+  mutate( species_name = str_replace_all(species_name, "\n", "")) %>%
+  write.table(paste(data_folder, 'rfs_summary.v114.tsv', sep = ''), 
+              quote = FALSE, sep = "\t", row.names = FALSE)
+```
+
