@@ -760,7 +760,6 @@ main <- function(parser){
   write.table(finalLOTFMs, file = TFMFile, 
               col.names = F, row.names = F, sep = "\t", quote = F,
               append = T)
-  system('rm tmp.gff tmpLiftOver*')
 }
 parser <- parsingArgs()
 main(parser)
