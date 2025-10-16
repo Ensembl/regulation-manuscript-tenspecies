@@ -643,6 +643,12 @@ main <- function(parser){
   system(paste('liftOver -gff', paste(outPath, 'tmp.gff', sep = '/'),
                chainFile, paste(outPath, toAnnotation, sep = '/'),
                paste(outPath, 'tmpLiftOver', sep ='/'), collapse = " "))
+  write.table(oldTFMs, paste(outPath, 'tmp.gff', sep = '/'), sep = '\t',
+              col.names = FALSE, row.names = FALSE, quote = FALSE)
+  system(paste('liftOver -gff', 
+               paste(outPath, 'tmp.gff', sep = '/'), chainFile, 
+               paste(outPath, toMotifs, sep = '/'), 
+               paste(outPath, 'tmpLiftOver', sep ='/'), collapse = " "))
   
   conn <- file(toAssemblyInfo, open="r")
   linn <- readLines(conn)
@@ -754,7 +760,7 @@ main <- function(parser){
   write.table(finalLOTFMs, file = TFMFile, 
               col.names = F, row.names = F, sep = "\t", quote = F,
               append = T)
-  
+  system('rm tmp.gff tmpLiftOver*')
 }
 parser <- parsingArgs()
 main(parser)

@@ -184,7 +184,10 @@ main <- function(parser){
   }
   # Filter to keep chromosomes of interest
   genomeAnnot %>%
-    filter(chr %in% chrs) -> genomeAnnot
+    filter(chr %in% chrs) %>%
+    mutate(chr = factor(chr, levels = chrs)) %>%
+    arrange(chr, start, end) -> genomeAnnot
+  
   # Extract transcripts biotype of interest
   if(!is.null(args$transcriptsBiotypes)){
     transcriptsBiotypes <- strsplit(args$transcriptsBiotypes, split = ',')[[1]]
