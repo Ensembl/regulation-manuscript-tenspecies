@@ -6,161 +6,50 @@ output: html_document
 ---
 
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "/Users/gmerino/Google Drive/My Drive/Bioinfo-GeneRegulationTeam/Projects/papers/regBuild2024/")
-options(scipen=999)
-
+options(scipen = 999)
 ```
 
 This script is aimed to explore the number of ATAC-seq, DNase-seq and ChIP-seq
 experiments processed with the Ensembl Regulation [primary analysis pipeline](https://regulation.ensembl.org/help/primary_processing)
 and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/). 
 
+**Note**: If you plan to run this script you need to update the following command to 
+replace `/your/full/path/to/` with the full path to the repository folder in your
+computer.
+
+```{r, eval = FALSE}
+my_path = "/your/full/path/to/regulation-manuscript-tenspecies/experiments-analysis"
+knitr::opts_knit$set(root.dir = my_path)
+# setwd(my_path) # optional if running interactively
+```
+
+Loading required libraries. 
 
 ```{r, warning = FALSE, message = FALSE}
 library(dplyr)
 library(tidyr)
 library(stringr)
-library(RPostgreSQL)
 library(ggplot2)
 library(cowplot)
 library(ggh4x)
 ```
 
-Connecting with the `Regulation Data Registry` database: 
+The table summarising the experiments metadata is available in the [regulation-manuscript-tenspecies/experiments-analysis/data]() folder and it has been built based on information retrieved from the `Regulation Data Registry` database. 
+
+Experiments metadata is available for the ten species included in Ensembl 114: *human, mouse, pig, chicken, cattle, Atlantic salmon, rainbow trout, turbot, European seabass, and common carp.*
 
 ```{r}
-db <- 'rdr'  
-
-host_db <- 'localhost' 
-
-db_port <- '2345' 
-
-db_user <- 'regulation_usr'
-
-db_password <- 'docker'
-
-con <- dbConnect(RPostgres::Postgres(), dbname = db, host = host_db, 
-                 port = db_port, user = db_user, password = db_password)  
-
-```
-
-Querying `analysis_file` information for open chromatin and ChIP-seq experiments:
-
-```{r, message = FALSE}
-queryAnalysisFiles <- "SELECT * FROM analysis_file 
-WHERE analysis_type IN ('atac_seq_peaks', 'dnase_seq_peaks',
-'chip_seq_gapped_peaks', 'chip_seq_narrow_peaks')"
-
-analysisMetadata <- dbGetQuery(con, queryAnalysisFiles, collapse="")
-```
-
-Querying `experiment` information for retrieved experiments:
-
-```{r, message = FALSE}
-queryExperiments <- paste("SELECT * FROM experiment_metadata 
-                          WHERE replicate_set_type = 'signal' AND
-                          experiment_id IN (", 
-                          paste(paste(paste("'", 
-                                        unique(analysisMetadata$experiment_id),
-                                        sep = ""), collapse = "',"), "')",
-                                sep = ""), sep = "")
-
-expMetadata <- dbGetQuery(con, queryExperiments, collapse="")
-
-```
-
-Combining `analysis_file` and `experiment` metadata tables: 
-
-```{r, message = FALSE}
-analysisMetadata %>% 
-  select(experiment_id, handover) %>% 
-  unique() %>%
-  left_join(expMetadata %>%
-              select(species_name, epigenome_name, name, experiment_id,
-                     experiment_type, experiment_target_type, 
-                     experiment_target, biomaterial_type, biosample_term,
-                     organ_slims, cell_slims, system_slims, life_stage_term,
-                     age_at_collection, age_at_collection_unit,thermal_time,
-                     age, age_unit, sex) %>%
-              unique(), relationship = "many-to-many") -> analysisMetadata
-```
-
-Unifying metadata information across replicates:
-
-```{r, message = FALSE}
-analysisMetadata %>%
-  replace_na(list(biomaterial_type='', biosample_term='', organ_slims='',
-                  cell_slims='', system_slims='', life_stage_term = '', 
-                  age_at_collection='', age_at_collection_unit = '', age = '', 
-                  age_unit = '', sex = '')) -> analysisMetadata
-
-analysisMetadata %>%
-  group_by(species_name, epigenome_name, name,
-           experiment_id, experiment_type, experiment_target_type, 
-           experiment_target, handover) %>%
-  summarise(biomaterial_type = paste(unique(biomaterial_type), collapse = ''),
-            biosample_term = paste(unique(biosample_term), collapse =''), 
-            organ_slims = paste(unique(organ_slims), collapse =''), 
-            cell_slims = paste(unique(cell_slims), collapse =''), 
-            system_slims = paste(unique(system_slims), collapse =''), 
-            life_stage_term = paste(unique(life_stage_term), collapse =''), 
-            age = paste(sort(unique(age)), collapse = ''),
-            age_unit = paste(sort(unique(age_unit)), collapse = ''),
-            age_at_collection = paste(sort(unique(age_at_collection)),
-                                      collapse = ''),
-            age_at_collection_unit = paste(sort(unique(age_at_collection_unit)),
-                                      collapse = ''),
-            thermal_time = paste(sort(unique(thermal_time)),
-                                      collapse = ''),
-            sex = paste(sort(unique(sex)), collapse = '')) %>%
-  as.data.frame() -> analysisMetadata
-
-```
-
-Keeping experiments that have been handed over in e!114:
-
-```{r, message = FALSE}
-analysisMetadata %>%
-  filter(handover) -> handoverMetadata
-```
-
-Parsing species, experiment, and biomaterial type names:
-
-```{r, message = FALSE}
-speciesMap <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 'Atlantic salmon',
-                'Rainbow trout', 'Turbot', 'European seabass', 'Common carp')
-names(speciesMap)<- c('Homo sapiens', 'Mus musculus', 'Sus scrofa',
-                      'Gallus gallus', 'Bos taurus', 'Salmo salar', 
-                      'Oncorhynchus mykiss', 'Scophthalmus maximus', 
-                      'Dicentrarchus labrax', 'Cyprinus carpio carpio')
-
-handoverMetadata %>%
-  mutate(experiment_target = if_else(experiment_target == 'atac_seq', 
-                                     'ATAC', experiment_target)) %>%
-  mutate(experiment_target = if_else(experiment_target == 'dnase_seq', 
-                                     'DNase', 
-                                     experiment_target)) %>%
-  mutate(species = speciesMap[species_name]) %>%
-  mutate(experiment_target = factor(experiment_target, 
-                                    levels = c('ATAC', 'DNase', 'H3K4me3',
-                                               'H3K27ac', 'H3K4me1', 
-                                               'H3K27me3', 'CTCF')),
-         species_name = factor(species_name, levels = names(speciesMap)),
-         species = factor(species, levels = speciesMap),
-         biomaterial_type = factor(str_replace_all(biomaterial_type, '_', ' '), 
-                                   levels = c("primary tissue", 
-                                              "primary cell", "cell line",
-                                              "primary cell culture"))
-         ) -> handoverMetadata
+read.delim(file = 'data/epigenomic_experiments_metadata_e114.tsv',
+            sep = '\t', header = T) -> experimentsMetadata
 ```
 
 
 Number of experiments per species
 
 ```{r, fig.width=12, fig.height=9, meassage = FALSE}
-handoverMetadata %>%
+experimentsMetadata %>%
   select(species, experiment_target) %>%
   group_by(species, experiment_target) %>%
   summarise( n = n()) %>% as.data.frame() -> dfPlot
@@ -192,7 +81,7 @@ g
 Removing H3K27me3 and combining open chromatin data
 
 ```{r, fig.width=10, fig.height=5, message = FALSE}
-handoverMetadata %>%
+experimentsMetadata %>%
   filter(experiment_target != 'H3K27me3') %>%
   select(species, experiment_target) %>%
   mutate(experiment_target = if_else(experiment_target %in% c('ATAC','DNase'),
@@ -237,11 +126,18 @@ g
 Number of experiments per biomaterial type and per species:
 
 ```{r, fig.width=24, fig.height=9, message = FALSE}
-handoverMetadata %>%
+experimentsMetadata %>%
   select(species, experiment_target, biomaterial_type, 
          life_stage_term, sex) %>%
   group_by(species, experiment_target, biomaterial_type) %>%
   summarise( n = n()) %>% as.data.frame() ->dfPlot
+
+speciesMap <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 'Atlantic salmon',
+                'Rainbow trout', 'Turbot', 'European seabass', 'Common carp')
+names(speciesMap)<- c('Homo sapiens', 'Mus musculus', 'Sus scrofa',
+                      'Gallus gallus', 'Bos taurus', 'Salmo salar', 
+                      'Oncorhynchus mykiss', 'Scophthalmus maximus', 
+                      'Dicentrarchus labrax', 'Cyprinus carpio carpio')
 
 specCols <- c('darkgreen', 'olivedrab3', 'midnightblue', 
               'purple4','darkturquoise', 'red2','darkorange', 'hotpink', 'tomato3',
@@ -270,7 +166,7 @@ Parsing tissues names or biosample terms in order to define `biosample groups`
 of epigenomes from cell lines and closely-related tissues:
 
 ```{r, message = FALSE}
-handoverMetadata %>% 
+experimentsMetadata %>% 
   mutate(biosample_group = if_else(biosample_term == 'immature gonad',
                                   'gonad', biosample_term)) %>% 
   mutate(biosample_group = if_else(grepl('adipose', biosample_group),
@@ -340,7 +236,7 @@ handoverMetadata %>%
                                      grepl('B cell', cell_slims)|
                                      (grepl('hematopoietic', cell_slims)  & 
                                         !(grepl('bone marrow', 
-                                                handoverMetadata$biosample_term))),
+                                                experimentsMetadata$biosample_term))),
                                    'blood', biosample_group)) %>%
   mutate(biosample_group = if_else(grepl('connective tissue', organ_slims),
                                    'connective tissue', biosample_group)) %>%
@@ -348,13 +244,13 @@ handoverMetadata %>%
                                      grepl('prostate', organ_slims) |
                                      grepl('vagina', organ_slims),
                                    'reproductive', biosample_group)
-         ) -> handoverMetadata
+         ) -> experimentsMetadata
 ```
 
 Number of experiment per biosample group and per species:
 
 ```{r, fig.width=12, fig.height=10, message = FALSE}
-handoverMetadata %>%
+experimentsMetadata %>%
   select(species, experiment_target, biosample_group, 
           life_stage_term, sex) %>%
   group_by(species, experiment_target, biosample_group) %>%
