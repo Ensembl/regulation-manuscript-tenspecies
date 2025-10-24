@@ -1121,7 +1121,7 @@ main <- function(parser){
   print(paste("Number of open chromatin union peaks overlapping TSSs: ",
               nrow(UPsTSS), sep = ""))
   
-  #4. Defining UPs-TSSs as promoters considering the updated start and end and
+  # 4. Defining UPs-TSSs as promoters considering the updated start and end and
   # the possibility of UPs overlapping more than 1 TSSs. In this case, if core
   # regions of potential promoters overlap, then the promoter is unique and its
   # boundaries are defined by combining the updated boundaries. If not, then 
@@ -1132,7 +1132,7 @@ main <- function(parser){
   promoters <- rfs[['promoters']]
   print(paste("Number of identified promoters: ", nrow(promoters), sep = ""))  
   
-    # 5. Consider cOCRs and UPs-noTSSs (merged nearby peaks up to maxDistOCR apart)
+  # 5. Consider cOCRs and UPs-noTSSs (merged nearby peaks up to maxDistOCR apart)
   #   as merged candidate Open Chromatin Regions (mcOCRs)
   
   cOCRs <- rfs[['cOCRs']] # cOCRs do not overlapping UPs in TSS
