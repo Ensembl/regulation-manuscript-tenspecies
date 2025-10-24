@@ -1226,24 +1226,46 @@ main <- function(parser){
                                'extended_end')]) %>%
       bind_rows(bt.intersect(ocUPs, promoters[,c('chr', 'extended_start',
                                                  'extended_end')])) -> ocUPs
-  }
-  if(!is.null(h3k4me3Peaks)){
-    H3K4me3UPs <- defineUnionPeaks(h3k4me3Peaks, d = maxDistH)
-    print(paste("Number of merged union H3K4me3UPs peaks: ", 
-                nrow(H3K4me3UPs), sep = ""))  
-    H3K4me3OCUPs <- bt.intersect(a = H3K4me3UPs, b = ocUPs, e = T,
-                                 f = histoneOverlap, F = histoneOverlap,
-                                 wa = T, u = T)
-    names(H3K4me3OCUPs) <- c('chr', 'start', 'end')
-    print(paste("Number of H3K4me3-OC union peaks: ", nrow(H3K4me3OCUPs),
-                sep = ""))
+    if(!is.null(h3k4me1Peaks)){
+      H3K4me1OCUPs <- bt.intersect(a = H3K4me1UPs, b = ocUPs, e = T, 
+                                   f = histoneOverlap, F = histoneOverlap, 
+                                   wa = T, u = T)
+      names(H3K4me1OCUPs) <- c('chr', 'start', 'end')
+      print(paste("Number of H3K4me1-OC union peaks: ", nrow(H3K4me1OCUPs),
+                  sep = ""))
+    }else{
+      H3K4me1OCUPs <- NULL
+    }
+    if(!is.null(h3k27acPeaks)){
+      H3K27acOCUPs <- bt.intersect(a = H3K27acUPs, b = ocUPs, e = T, 
+                                   f = histoneOverlap, F = histoneOverlap, 
+                                   wa = T, u = T)
+      names(H3K27acOCUPs) <- c('chr', 'start', 'end')
+      print(paste("Number of H3K27ac-OC union peaks: ", nrow(H3K27acOCUPs),
+                  sep = ""))
+    }else{
+      H3K27acOCUPs <- NULL
+    }
+    if(!is.null(h3k4me3Peaks)){
+      H3K4me3UPs <- defineUnionPeaks(h3k4me3Peaks, d = maxDistH)
+      print(paste("Number of merged union H3K4me3UPs peaks: ", 
+                  nrow(H3K4me3UPs), sep = ""))  
+      H3K4me3OCUPs <- bt.intersect(a = H3K4me3UPs, b = ocUPs, e = T,
+                                   f = histoneOverlap, F = histoneOverlap,
+                                   wa = T, u = T)
+      names(H3K4me3OCUPs) <- c('chr', 'start', 'end')
+      print(paste("Number of H3K4me3-OC union peaks: ", nrow(H3K4me3OCUPs),
+                  sep = ""))
+    }else{
+      H3K4me3OCUPs <- NULL
+    }
+    emars <- emarsIdentification(ocUPs, H3K4me1OCUPs, H3K27acOCUPs,
+                                 H3K4me3OCUPs, OCRsHistoneOverlap, minOCRLen)
+    print(paste("Number of identified EMARs: ", nrow(emars), sep = ""))  
   }else{
-    H3K4me3OCUPs <- NULL
+    emars <- NULL
   }
-  emars <- emarsIdentification(ocUPs, H3K4me1OCUPs, H3K27acOCUPs,
-                               H3K4me3OCUPs, OCRsHistoneOverlap, minOCRLen)
-  print(paste("Number of identified EMARs: ", nrow(emars), sep = ""))  
-  # 10. Generate RFs gff table
+  # 11. Generate RFs gff table
   # RFs will be combined in a single object, adding the regulatory feature type
   promoters %>% 
     mutate(chr = as.character(chr), type = 'promoter') -> rfs
@@ -1252,18 +1274,27 @@ main <- function(parser){
     rfs %>%
       bind_rows(enhancers %>% mutate(chr = as.character(chr),
                                      type = 'enhancer')) -> rfs
-    # rfs <- rbind(rfs, cbind(enhancers, type = 'enhancer'))
   }
   rfs %>%
     bind_rows(mcOCRs %>% 
                 mutate(chr = as.character(chr), 
-                       type = 'open_chromatin_region')) %>%
-    bind_rows(emars %>% 
-                mutate(chr = as.character(chr), 
-                       type = 'EMAR')) -> rfs
+                       type = 'open_chromatin_region')) -> rfs
+    
+  if(!is.null(emars)){
+    rfs %>%
+      bind_rows(emars %>% 
+                  mutate(chr = as.character(chr), 
+                         type = 'EMAR')) -> rfs
+  }
   names(rfs) <- c(names(promoters), 'type')
+  if(!is.null(previousRegBuild)){
+    featuresToMerge <- c('promoter', 'open_chromatin_region')
+    if(annotateEnhancers) featuresToMerge <- c(featuresToMerge, 'enhancer')
+    if(!is.null(emars)) featuresToMerge <- c(featuresToMerge, 'EMAR')
+  }
   RFsGFF <- createRFsGFF(rfs, chrs, ESpePre, startID, previousRegBuild, 
-                         annotatedTSSsAndInfo, source = 'Ensembl')
+                         annotatedTSSsAndInfo, featuresToMerge = featuresToMerge, 
+                         source = 'Ensembl')
   date <- paste0(strsplit(as.character(Sys.Date()), 
                           split = "-")[[1]], collapse = "")
   gff3h <- "##gff-version 3"
