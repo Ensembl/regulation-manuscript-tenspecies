@@ -11,19 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 options(scipen = 999)
 ```
 
-This script is aimed to explore the number of ATAC-seq, DNase-seq and ChIP-seq
-experiments processed with the Ensembl Regulation [primary analysis pipeline](https://regulation.ensembl.org/help/primary_processing)
+This script explores the number of ATAC-seq, DNase-seq and ChIP-seq
+experiments processed with the Ensembl Regulation primary analysis pipeline
 and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/). 
 
-**Note**: If you plan to run this script you need to update the following command to 
-replace `/your/full/path/to/` with the full path to the repository folder in your
-computer.
-
-```{r, eval = FALSE}
-my_path = "/your/full/path/to/regulation-manuscript-tenspecies/experiments-analysis"
-knitr::opts_knit$set(root.dir = my_path)
-# setwd(my_path) # optional if running interactively
-```
 
 Loading required libraries. 
 
@@ -36,7 +27,7 @@ library(cowplot)
 library(ggh4x)
 ```
 
-The table summarising the experiments metadata is available in the [regulation-manuscript-tenspecies/experiments-analysis/data]() folder and it has been built based on information retrieved from the `Regulation Data Registry` database. 
+The table summarising the experiments metadata is available in the [data](data) folder and it has been built based on information retrieved from the `Regulation Data Registry` database. 
 
 Experiments metadata is available for the ten species included in Ensembl 114: *human, mouse, pig, chicken, cattle, Atlantic salmon, rainbow trout, turbot, European seabass, and common carp.*
 
@@ -48,7 +39,7 @@ read.delim(file = 'data/epigenomic_experiments_metadata_e114.tsv',
 
 Number of experiments per species
 
-```{r, fig.width=12, fig.height=9, meassage = FALSE}
+```{r, fig.width=12, fig.height=9, message = FALSE, warning = FALSE}
 experimentsMetadata %>%
   select(species, experiment_target) %>%
   group_by(species, experiment_target) %>%
@@ -67,7 +58,7 @@ g <- ggplot(dfPlot) +
       facet_nested( experiment_target ~ species, 
                     scales = 'free_x', drop = TRUE, space = 'free') +
       theme_bw() +  coord_cartesian(expand = FALSE) +
-      labs(x = '', y = '', fill = '', color = '') +
+      labs(x = '', y = '', fill = '') +
       theme(legend.position = 'none', axis.text.x = element_blank(),
             axis.ticks.x = element_blank(), axis.text.y = element_blank(),
             axis.ticks.y = element_blank(), panel.grid = element_blank(),
@@ -80,7 +71,7 @@ g
 
 Removing H3K27me3 and combining open chromatin data
 
-```{r, fig.width=10, fig.height=5, message = FALSE}
+```{r, fig.width=10, fig.height=5, message = FALSE, warning = FALSE}
 experimentsMetadata %>%
   filter(experiment_target != 'H3K27me3') %>%
   select(species, experiment_target) %>%
@@ -125,7 +116,7 @@ g
 
 Number of experiments per biomaterial type and per species:
 
-```{r, fig.width=24, fig.height=9, message = FALSE}
+```{r, fig.width=24, fig.height=9, message = FALSE, warning = FALSE}
 experimentsMetadata %>%
   select(species, experiment_target, biomaterial_type, 
          life_stage_term, sex) %>%
@@ -165,7 +156,7 @@ g
 Parsing tissues names or biosample terms in order to define `biosample groups` 
 of epigenomes from cell lines and closely-related tissues:
 
-```{r, message = FALSE}
+```{r, message = FALSE, warning = FALSE}
 experimentsMetadata %>% 
   mutate(biosample_group = if_else(biosample_term == 'immature gonad',
                                   'gonad', biosample_term)) %>% 
@@ -249,7 +240,7 @@ experimentsMetadata %>%
 
 Number of experiment per biosample group and per species:
 
-```{r, fig.width=12, fig.height=10, message = FALSE}
+```{r, fig.width=12, fig.height=10, message = FALSE, warning = FALSE}
 experimentsMetadata %>%
   select(species, experiment_target, biosample_group, 
           life_stage_term, sex) %>%
@@ -308,7 +299,7 @@ tetrapods_legend <-get_plot_component(tetrapods_plot +
 
 Figure **1a**: Fishes
 
-```{r, fig.width=12,fig.height=3.5, message = FALSE}
+```{r, fig.width=12,fig.height=3.5, message = FALSE, warning = FALSE}
 fishes <- c('Atlantic salmon', 'Common carp', 'European seabass',
             'Rainbow trout', 'Turbot')
 
@@ -339,7 +330,7 @@ dfPlot %>%
 
 Arranging both panel in a single figure:
 
-```{r, fig.width=10,fig.height= 9.6, message = FALSE}
+```{r, fig.width=10,fig.height= 9.6, message = FALSE, warning = FALSE}
 Figure_1_a <- plot_grid(plot_grid(tetrapods_plot, 
                     # adding and empty plot just for adjusting margins 
                     plot_grid(ggplot() + 

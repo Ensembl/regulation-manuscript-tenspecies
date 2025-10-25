@@ -10,8 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 options(scipen=999)
 ```
 
-This script is aimed to plot the number of Ensembl Regulatory Features identified with the Ensembl [Regulatory Build](https://regulation.ensembl.org/help/regulatory_build)
-and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/). 
+This script plots the number of Ensembl Regulatory Features identified with the Ensembl Regulatory Build
+and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/).
 
 
 ```{r, warning = FALSE, message = FALSE}
@@ -22,12 +22,10 @@ library(ggplot2)
 
 The first step is to load the summarised data describing the number of feature per feature type for each species. 
 
-The file containing this data is available in the [experiments-analysis/data](./experiments-analysis/data) folder.
-
-This code is meant to be ran with the working directory set to the repository folder. If you want to use this code, make sure you specify the correct path to your data folder.
+The file containing this data is available in the [data](data) folder.
 
 ```{r}
-data_folder <- "experiments-analysis/data"
+data_folder <- "data"
 read.delim(paste(data_folder, 'rfs_summary_e114.tsv', sep = '/'), 
            header = T, sep = '\t') -> rfs_summary
 rfs_summary %>% 
