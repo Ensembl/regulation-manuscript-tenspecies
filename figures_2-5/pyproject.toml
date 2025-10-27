@@ -1,0 +1,21 @@
+[project]
+name = "ensembl-regulatory-annotation-manuscript"
+authors = ["Garth Ilsley"]
+version = "0.1.0"
+classifiers = ["Private :: Do Not Upload"]
+license = "MIT OR Apache-2.0"
+description = "Code and notebooks to generate figures 2-5 of the associated manuscript"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "formulaic>=1.1.1",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.8.4",
+    "pandas>=2.3.0",
+    "pygenometracks~=3.9",
+    "python-pptx>=1.0.2",
+    "scikit-learn>=1.7.0",
+    "seaborn>=0.13.2",
+    "statsmodels>=0.14.4",
+    "upsetplot>=0.9.0",
+]
