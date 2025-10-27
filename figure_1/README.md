@@ -5,7 +5,7 @@ This folder contains the scripts for reproducing Figure 1 of the manuscript.
 - [metadataProcessing.Rmd](metadataProcessing.Rmd) is used to explore the number of epigenomic experiments processed
 by the Ensembl Regulation primary analysis pipeline to summarise it for Figure 1a.
 
-- [RFsSummary.Rmd](./scripts/RFsSummary.Rmd) is used to plot the number of features per species identified by the Ensembl Regulatory Build displayed in Figure 1b.
+- [RFsSummary.Rmd](RFsSummary.Rmd) is used to plot the number of features per species identified by the Ensembl Regulatory Build displayed in Figure 1b.
 
 ---
 
