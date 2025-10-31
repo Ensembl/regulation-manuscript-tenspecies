@@ -11,6 +11,8 @@ The different scripts and directories are as follows:
 | <nobr>Base regulatory annotation</nobr> | <nobr>[regulatory-annotation](regulatory-annotation/README.md)</nobr> | Process primary analysis files to produce promoters, enhancers and unclassified open chromatin regions |
 | <nobr>Finalise regulatory annotation</nobr> | <nobr>[ctcf_and_stable_id](ctcf_and_stable_id/README.md)</nobr> | Parse and add CTCF features (where present) to the base annotation, assign stable ids and generate the final GFF3 file. |
 
+Some scripts make use of a top-level `data` directory. The files in this directory can be downloaded from Zenodo: [https://doi.org/10.5281/zenodo.17496015](https://doi.org/10.5281/zenodo.17496015).
+
 #### License
 
 Scripts and code are licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
