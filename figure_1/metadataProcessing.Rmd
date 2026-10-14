@@ -41,9 +41,9 @@ read.delim(file = 'data/epigenomic_experiments_metadata_2026-08.tsv',
 Parsing species common names
 
 ```{r}
-speciesMap <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 'Atlantic\nsalmon',
+speciesMap <- c('Human', 'Mouse', 'Pig', 'Cattle', 'Chicken', 'Atlantic\nsalmon',
                 'Rainbow\ntrout', 'Common\ncarp', 'European\nseabass', 'Turbot')
-names(speciesMap) <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 
+names(speciesMap) <- c('Human', 'Mouse', 'Pig', 'Cattle', 'Chicken', 
                       'Atlantic salmon', 'Rainbow trout', 'Common carp',
                       'European seabass', 'Turbot')
 ```
