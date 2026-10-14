@@ -1,7 +1,7 @@
 ---
-title: "Regulatory Features in Ensembl 114"
+title: "Regulatory Features in Ensembl Regulation 2026-08"
 author: "Gabriela Merino - Ensembl Regulation"
-date: "2025-10-14"
+date: "2026-10-14"
 output: html_document
 ---
 
@@ -11,7 +11,7 @@ options(scipen=999)
 ```
 
 This script plots the number of Ensembl Regulatory Features identified with the Ensembl Regulatory Build
-and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/).
+and released in the 2026-08 version.
 
 
 ```{r, warning = FALSE, message = FALSE}
@@ -20,13 +20,14 @@ library(stringr)
 library(ggplot2)
 ```
 
-The first step is to load the summarised data describing the number of feature per feature type for each species. 
+The first step is to load the summarised data describing the number of feature 
+per feature type for each species. 
 
 The file containing this data is available in the [data](data) folder.
 
 ```{r}
 data_folder <- "data"
-read.delim(paste(data_folder, 'rfs_summary_e114.tsv', sep = '/'), 
+read.delim(paste(data_folder, 'rfs_summary.2026-08.tsv', sep = '/'), 
            header = T, sep = '\t') -> rfs_summary
 rfs_summary %>% 
   head()
@@ -35,44 +36,33 @@ rfs_summary %>%
 Parsing the species names for a better display. 
 
 ```{r}
-species_names <- c('Human', 'Mouse', "Pig", "Chicken", "Cattle", 
-                   "Atlantic \n salmon", "Turbot", "European \n seabass", 
-                   "Rainbow \n trout", "Common \n carp")
-
-names(species_names) <- c('Homo_sapiens', 'Mus_musculus', 'Sus_scrofa', 
-                          'Gallus_gallus', 'Bos_taurus', 'Salmo_salar', 
-                          'Scophthalmus_maximus', 'Dicentrarchus_labrax', 
-                          'Oncorhynchus_mykiss', 'Cyprinus_carpio_carpio')
+speciesMap <- c('Human', 'Mouse', 'Pig', 'Cattle', 'Chicken', 'Atlantic\nsalmon',
+                'Rainbow\ntrout', 'Common\ncarp', 'European\nseabass', 'Turbot')
+names(speciesMap) <- c('Human', 'Mouse', 'Pig', 'Cattle', 'Chicken', 
+                      'Atlantic salmon', 'Rainbow trout', 'Common carp',
+                      'European seabass', 'Turbot')
 rfs_summary %>% 
-  mutate(species = factor(species, levels = names(species_names), 
-                          labels = species_names)) -> rfs_summary
-
-rfs_summary %>% 
-  head()
+  mutate(species_name = factor(speciesMap[species_name],
+                               levels = speciesMap)) -> rfs_summary
 ```
 
 Parsing the feature type for a better display. 
 
 ```{r}
-feature_types <- c("promoter",  "enhancer", "CTCF binding site",  
-                   "open chromatin" )
-
-names(feature_types) <- c("promoter", "enhancer", "CTCF_binding_site", 
-                          "open_chromatin_region" )
+feature_types <- c("promoter",  "enhancer", "open chromatin", 
+                   "CTCF binding site")
 
 rfs_summary %>%
-  mutate(type = factor( type, levels = names(feature_types),
-                        labels = feature_types)) -> rfs_summary
-rfs_summary %>% 
-  head()
+  mutate(type = factor( type, levels = feature_types)) -> rfs_summary
+
 ```
 
 ```{r, fig.height=5, fig.width=9, dpi = 300}
-rf_colors <- c('promoter' = '#ff0000', 'enhancer' = '#faca00', 
-            'CTCF binding site' = '#40e0d0', 'open chromatin' = '#d9d9d9')
+rf_colors <- c('promoter' = '#d90000', 'enhancer' = '#f8c041', 
+            'open chromatin' = '#b7c0c8', 'CTCF binding site' = '#8ef4f8')
 
 rfs_summary %>%
-  ggplot(aes (x = species, y = n, fill = type)) + 
+  ggplot(aes (x = species_name, y = n, fill = type)) + 
   geom_bar(stat = 'identity', position = position_stack(reverse = TRUE)) +
   theme_bw() +
   theme(legend.position = "inside", legend.position.inside = c(0.9,0.9), 
@@ -81,7 +71,7 @@ rfs_summary %>%
         panel.grid = element_blank()) + 
   labs(fill = '', x = '', y = 'Number of annotated regulatory regions') + 
   scale_fill_manual(values = rf_colors) + 
-  scale_y_continuous(limits = c(0, 400000), breaks = seq(0, 400000, 50000),
+  scale_y_continuous(limits = c(0, 650000), breaks = seq(0, 650000, 50000),
                      expand = c(0,0)) -> Figure_1_b
 Figure_1_b
 

@@ -1,0 +1,38 @@
+type	species_name	n
+promoter	Turbot	10677
+enhancer	Turbot	31706
+CTCF binding site	Turbot	3088
+open chromatin	Turbot	29783
+open chromatin	European seabass	44098
+enhancer	European seabass	66075
+promoter	European seabass	10946
+open chromatin	Common carp	60842
+promoter	Common carp	19685
+enhancer	Common carp	45897
+CTCF binding site	Common carp	5756
+open chromatin	Rainbow trout	73041
+promoter	Rainbow trout	22983
+enhancer	Rainbow trout	121062
+enhancer	Atlantic salmon	214545
+promoter	Atlantic salmon	36093
+open chromatin	Atlantic salmon	95775
+open chromatin	Cattle	30849
+CTCF binding site	Cattle	40008
+enhancer	Cattle	76744
+promoter	Cattle	15133
+enhancer	Chicken	116469
+CTCF binding site	Chicken	15461
+promoter	Chicken	22769
+open chromatin	Chicken	84838
+enhancer	Pig	137209
+promoter	Pig	17435
+open chromatin	Pig	58378
+CTCF binding site	Pig	33359
+CTCF binding site	Mouse	81691
+enhancer	Mouse	168413
+promoter	Mouse	34183
+open chromatin	Mouse	13399
+promoter	Human	47245
+CTCF binding site	Human	90891
+enhancer	Human	452338
+open chromatin	Human	35574
