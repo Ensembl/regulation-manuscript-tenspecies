@@ -1,7 +1,7 @@
 ---
-title: "Epigenomic experiments in Ensembl 114"
+title: "Epigenomic experiments in Ensembl Regulation 2026-08"
 author: "Gabriela Merino - Ensembl Regulation"
-date: "2025-09-19"
+date: "2026-07-20"
 output: html_document
 ---
 
@@ -13,8 +13,7 @@ options(scipen = 999)
 
 This script explores the number of ATAC-seq, DNase-seq and ChIP-seq
 experiments processed with the Ensembl Regulation primary analysis pipeline
-and released in [Ensembl 114](https://ftp.ensembl.org/pub/release-114/regulation/). 
-
+and released in the 2026-08 version. 
 
 Loading required libraries. 
 
@@ -27,15 +26,27 @@ library(cowplot)
 library(ggh4x)
 ```
 
-The table summarising the experiments metadata is available in the [data](data) folder and it has been built based on information retrieved from the `Regulation Data Registry` database. 
+The table summarising the experiments metadata is available in the [data](data) 
+folder and it has been built based on information retrieved from the 
+`Regulation Data Registry` database. 
 
-Experiments metadata is available for the ten species included in Ensembl 114: *human, mouse, pig, chicken, cattle, Atlantic salmon, rainbow trout, turbot, European seabass, and common carp.*
+Experiments metadata is available for the ten species included in the release: 
+*human, mouse, pig, chicken, cattle, Atlantic salmon, rainbow trout, turbot, European seabass, and common carp.*
 
 ```{r}
-read.delim(file = 'data/epigenomic_experiments_metadata_e114.tsv',
+read.delim(file = 'data/epigenomic_experiments_metadata_2026-08.tsv',
             sep = '\t', header = T) -> experimentsMetadata
 ```
 
+Parsing species common names
+
+```{r}
+speciesMap <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 'Atlantic\nsalmon',
+                'Rainbow\ntrout', 'Turbot', 'European\nseabass', 'Common\ncarp')
+names(speciesMap) <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 
+                      'Atlantic salmon', 'Rainbow trout', 'Turbot',
+                      'European seabass', 'Common carp')
+```
 
 Number of experiments per species
 
@@ -43,11 +54,14 @@ Number of experiments per species
 experimentsMetadata %>%
   select(species, experiment_target) %>%
   group_by(species, experiment_target) %>%
-  summarise( n = n()) %>% as.data.frame() -> dfPlot
+  summarise( n = n()) %>% 
+  as.data.frame() %>%
+  mutate(species = factor(speciesMap[species], levels = speciesMap)) -> dfPlot
 
 markCols <- c('chartreuse3', 'darkolivegreen', 'red2', 'gold', 'peru',
               'darkviolet', 'cyan3')
-names(markCols) <- levels(dfPlot$experiment_target)
+names(markCols) <- c('ATAC', 'DNase', 'H3K4me3', 'H3K27ac', 'H3K4me1', 
+                     'H3K27me3', 'CTCF')
 
 g <- ggplot(dfPlot) +
       geom_bar(aes(x = 1, y = 1, 
@@ -69,50 +83,6 @@ g <- ggplot(dfPlot) +
 g
 ```
 
-Removing H3K27me3 and combining open chromatin data
-
-```{r, fig.width=10, fig.height=5, message = FALSE, warning = FALSE}
-experimentsMetadata %>%
-  filter(experiment_target != 'H3K27me3') %>%
-  select(species, experiment_target) %>%
-  mutate(experiment_target = if_else(experiment_target %in% c('ATAC','DNase'),
-                                     'ATAC \n DNase', experiment_target)) %>%
-  mutate(species = str_replace_all(species, ' ', '\n')) %>%
-  group_by(species, experiment_target) %>%
-  summarise( n = n()) %>% as.data.frame() ->dfPlot
-
-dfPlot %>%
-  mutate(experiment_target = factor(experiment_target, 
-                                    levels = c("ATAC \n DNase","H3K4me3",
-                                               "H3K27ac", "H3K4me1", 
-                                               "CTCF"))) %>%
-  mutate(species = factor(species, levels = c("Human", "Mouse", "Pig",
-                                              "Chicken", "Cattle", 
-                                              "Atlantic\nsalmon",
-                                               "European\nseabass", "Turbot",
-                                              "Rainbow\ntrout", 
-                                              "Common\ncarp")))-> dfPlot
-markCols <- c('chartreuse3', 'red2', 'gold', 'peru','cyan3')
-names(markCols) <- unique(dfPlot$experiment_target)
-
-g <- ggplot(dfPlot) +
-      geom_bar(aes(x = 1, y = 1, 
-                   fill = experiment_target, alpha = n), stat = 'identity',
-               position = position_dodge(width = 1)) +
-      geom_text(aes( x = 1, y = 0.5, label = n), size = 5) + 
-      facet_nested( experiment_target ~ species, 
-                    scales = 'free_x', drop = TRUE, space = 'free') +
-      theme_bw() +  coord_cartesian(expand = FALSE) +
-      labs(x = '', y = '', fill = '', color = '') +
-      theme(legend.position = 'none', axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(), axis.text.y = element_blank(),
-            axis.ticks.y = element_blank(), panel.grid = element_blank(),
-            strip.text.x = element_text(size = 11,face = 'bold'), 
-            strip.text.y = element_text(size = 11,face = 'bold')
-            ) +
-      scale_fill_manual(values = markCols)  
-g
-```
 
 Number of experiments per biomaterial type and per species:
 
@@ -120,15 +90,14 @@ Number of experiments per biomaterial type and per species:
 experimentsMetadata %>%
   select(species, experiment_target, biomaterial_type, 
          life_stage_term, sex) %>%
+  mutate(species = factor(speciesMap[species], levels = speciesMap)) %>%
   group_by(species, experiment_target, biomaterial_type) %>%
-  summarise( n = n()) %>% as.data.frame() ->dfPlot
+  summarise( n = n()) %>% 
+  as.data.frame() %>%
+  mutate(experiment_target = factor(experiment_target, 
+                                    levels = names(markCols))) ->dfPlot
 
-speciesMap <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 'Atlantic salmon',
-                'Rainbow trout', 'Turbot', 'European seabass', 'Common carp')
-names(speciesMap)<- c('Homo sapiens', 'Mus musculus', 'Sus scrofa',
-                      'Gallus gallus', 'Bos taurus', 'Salmo salar', 
-                      'Oncorhynchus mykiss', 'Scophthalmus maximus', 
-                      'Dicentrarchus labrax', 'Cyprinus carpio carpio')
+
 
 specCols <- c('darkgreen', 'olivedrab3', 'midnightblue', 
               'purple4','darkturquoise', 'red2','darkorange', 'hotpink', 'tomato3',
@@ -245,11 +214,11 @@ experimentsMetadata %>%
   select(species, experiment_target, biosample_group, 
           life_stage_term, sex) %>%
   group_by(species, experiment_target, biosample_group) %>%
-  summarise( n = n()) %>% as.data.frame() ->dfPlot
+  summarise( n = n()) %>% as.data.frame() %>%
+  mutate(experiment_target = factor(experiment_target, 
+                                    levels = names(markCols))) ->dfPlot
 
-markCols <- c('chartreuse3', 'darkolivegreen', 'red2', 'gold', 'peru',
-              'darkviolet', 'cyan3')
-names(markCols) <- levels(dfPlot$experiment_target)
+
 dfPlot %>%
   arrange(desc(biosample_group))-> dfPlot
 dfPlot[,'biosample_group'] <- factor(dfPlot[,'biosample_group'],
@@ -267,6 +236,7 @@ dfPlot %>%
   filter(species %in% tetrapods) %>%
   mutate(nDisc = cut(n, breaks = c(-Inf,0,1,5,Inf), 
                      labels = alphaScale)) %>%
+  mutate(species = factor(species, levels = tetrapods)) %>%
   ggplot() +
   geom_tile(aes(x = experiment_target, y = biosample_group,
                 fill = experiment_target, alpha = nDisc)) +
@@ -300,13 +270,14 @@ tetrapods_legend <-get_plot_component(tetrapods_plot +
 Figure **1a**: Fishes
 
 ```{r, fig.width=12,fig.height=3.5, message = FALSE, warning = FALSE}
-fishes <- c('Atlantic salmon', 'Common carp', 'European seabass',
-            'Rainbow trout', 'Turbot')
+fishes <- c('Atlantic salmon', 'Rainbow trout', 'Turbot', 'European seabass',
+             'Common carp')
 
 dfPlot %>%
   filter(species %in% fishes) %>%
   mutate(nDisc = cut(n, breaks = c(-Inf,0,1,5,Inf), 
                      labels = alphaScale)) %>%
+  mutate(species = factor(species, levels = fishes)) %>%
   ggplot() +
   geom_tile(aes(x = experiment_target, y = biosample_group,
                 fill = experiment_target, alpha = nDisc)) +
