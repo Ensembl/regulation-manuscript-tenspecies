@@ -31,7 +31,7 @@ folder and it has been built based on information retrieved from the
 `Regulation Data Registry` database. 
 
 Experiments metadata is available for the ten species included in the release: 
-*human, mouse, pig, chicken, cattle, Atlantic salmon, rainbow trout, turbot, European seabass, and common carp.*
+*human, mouse, pig, chicken, cattle, Atlantic salmon, rainbow trout, common carp, European seabass, and turbot.*
 
 ```{r}
 read.delim(file = 'data/epigenomic_experiments_metadata_2026-08.tsv',
@@ -42,10 +42,10 @@ Parsing species common names
 
 ```{r}
 speciesMap <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 'Atlantic\nsalmon',
-                'Rainbow\ntrout', 'Turbot', 'European\nseabass', 'Common\ncarp')
+                'Rainbow\ntrout', 'Common\ncarp', 'European\nseabass', 'Turbot')
 names(speciesMap) <- c('Human', 'Mouse', 'Pig', 'Chicken', 'Cattle', 
-                      'Atlantic salmon', 'Rainbow trout', 'Turbot',
-                      'European seabass', 'Common carp')
+                      'Atlantic salmon', 'Rainbow trout', 'Common carp',
+                      'European seabass', 'Turbot')
 ```
 
 Number of experiments per species
@@ -270,8 +270,8 @@ tetrapods_legend <-get_plot_component(tetrapods_plot +
 Figure **1a**: Fishes
 
 ```{r, fig.width=12,fig.height=3.5, message = FALSE, warning = FALSE}
-fishes <- c('Atlantic salmon', 'Rainbow trout', 'Turbot', 'European seabass',
-             'Common carp')
+fishes <- c('Atlantic salmon', 'Rainbow trout', 'Common carp', 
+            'European seabass', 'Turbot')
 
 dfPlot %>%
   filter(species %in% fishes) %>%
